@@ -1,0 +1,66 @@
+<html>
+    <body>
+        <div id='fb-root'></div>
+        <script>
+            // Additional 35 functions here
+            window.fbAsyncInit = function() {
+                FB.init({
+                    appId   : '251151238962941', //App ID
+                    status  : true, // check login status
+                    cookie  : true, // enable cookies to allow the server to access the session
+                    xfbml   : true // parse XFBML
+                });
+            
+                FB.getLoginStatus(function(response) {
+                    if (response.status === 'connected') {
+                        alert("logged in");
+                        // make sure your FB API calls here - app is auth'ed to make calls for the user
+                    } else if (response.status === 'not_authorized'){
+                        alert("not_authorized");
+                        // user is logged into FB but not auth'ed to use your app - auth now
+                        FB.login(function(response) {}, {scope: 'publish_stream'});
+                    } else {
+                        alert("not logged in: "+response.status);
+                        // user is not logged into FB - log them in 
+                        FB.login(function(response) {}, {scope: 'publish_stream'});
+                    }
+                });
+            };
+            
+            var message = "Testing out app";
+            var post_id = 0;
+
+            function postit(){
+            FB.api('/mefeed', 'post', { message : message }, function(response){
+            if( !response || response.error ) {
+                alert('Error');
+            } else {
+                post_id = reponse.id;
+                alert('ID: ' + response.id);
+            }
+        });
+    }
+
+function deleteit(){
+    FB.api(post_id, 'delete', function(response){
+        if(!response || response.error) {
+            alert('Error');
+        } else {
+            alert('Post' + post_id + 'deleted');
+        }
+    });
+}
+
+            // Load the SDK synchronously 
+            (function(d){
+                var js, id = 'facebook-jssdk', ref = d.getElementsbyTagName('script')[0];
+                if (d.getElementbyId(id)) {return;}
+                js = d.createElement('script'); js.id = id; js.async = true;
+                js.src = "//connect.facebook.net/en_US/all.js";
+                ref.parentNode.insertBefore(js, ref);
+            }(document));
+        </script>
+        <p><a href ="#" onclick="postit();return false">Post it!</a></p>
+        <p><a href ="#" onclick="deleteit();return false">Delete it!</a></p>
+    </body>
+</html>
